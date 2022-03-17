@@ -1,0 +1,25 @@
+---
+title: "Diatom-based paleoenviromental reconstruction from Northern Patagonia "
+author: "Camilo Vélez"
+date: "15/8/2021"
+output:
+  html_notebook:
+    code_folding: "show"
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, echo = TRUE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(vegan)
+library(rioja)
+library(ggplot2)
+library(ggpubr)
+library(kableExtra)
+library(gridExtra)
+library(rstatix)
+```
+
+Seven sedimentary cores were analyzed. Diatom zones characterized by cluster analysis in the fossil sequences were correlated and the diatom content was compared with modern assemblages using specific multivariate ordination analysis (NMDS).
