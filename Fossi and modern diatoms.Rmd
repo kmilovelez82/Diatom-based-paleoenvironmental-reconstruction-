@@ -23,3 +23,104 @@ library(rstatix)
 ```
 
 Seven sedimentary cores were analyzed. Diatom zones characterized by cluster analysis in the fossil sequences were correlated and the diatom content was compared with modern assemblages using specific multivariate ordination analysis (NMDS).
+
+```{r Loading.Data}
+
+species.complet <- readRDS("species.complet.rds")
+```
+
+# **Non-Metric Multidimensional Scaling** #
+```{r results = FALSE}
+data.mds <- metaMDS(
+  species.complet[-c(154, 155, 212, 230),-c(1, 2)],
+  distance = "bray",
+  autotransform = FALSE
+)
+
+data.spp.fit <- envfit(
+  data.mds, 
+  species.complet[-c(154, 155, 212, 230),-c(1, 2)],
+  permutations = 999
+  ) ##This fits species vectors##
+
+site.scrs <- as.data.frame(scores(data.mds, display = "sites"))
+
+site.scrs$ID <- species.complet[-c(154, 155, 212, 230),]$ID
+site.scrs$ID2 <- species.complet[-c(154, 155, 212, 230),]$ID2
+```
+
+```{r}
+##Save species intrinsic values into dataframe##
+spp.scrs <- as.data.frame(
+  scores(
+    data.spp.fit, 
+    display = "vectors"
+    )) * 
+  ordiArrowMul(
+      data.spp.fit, 
+      fill = 1
+      )
+```
+
+```{r}
+##Add species names to dataframe##
+spp.scrs <- cbind(spp.scrs, Species = rownames(spp.scrs))
+
+#add pvalues to dataframe so you can select species which are significant
+spp.scrs <- cbind(spp.scrs, pval = data.spp.fit$vectors$pvals)
+
+#subset data to show species significant at 0.05
+sig.spp.scrs <- subset(spp.scrs, pval <= 0.012) 
+```
+
+```{r}
+cols <- c("Chubut River" = "limegreen", "T7" = "limegreen",
+          "Colorado River" = "brown1", "T1" = "brown1", "T2" = "brown1",
+          "T3" = "dodgerblue2", "T4" = "dodgerblue2",
+          "Negro River" = "gray8", "T5" = "gray8", "T6" = "gray8")
+
+symb <- c("Chubut River" = 16, "T7" = 17,
+          "Colorado River" = 16, "T1" = 17, "T2" = 2,
+          "T3" = 17, "T4" = 2,
+          "Negro River" = 16, "T5" = 2, "T6" = 17)
+```
+
+```{r fig.width=10, fig.height=10}
+ggplot(site.scrs, 
+       aes(x=NMDS1, y=NMDS2)
+       ) +
+  geom_point(
+    aes(x=NMDS1, y=NMDS2, colour = ID, shape = ID), 
+    size = 2.5, 
+    alpha = 0.8, 
+    show.legend = T
+    ) +
+  scale_shape_manual(values = symb) +
+  scale_colour_manual(values = cols) +
+  geom_segment(
+    data = sig.spp.scrs, 
+    aes(x = 0, xend = NMDS1, y = 0, yend = NMDS2), 
+    alpha = 0.5, 
+    colour = "grey30", 
+    lwd=0.3
+    ) +
+  ggrepel::geom_text_repel(
+    data = sig.spp.scrs, 
+    aes(x=NMDS1, y=NMDS2, label = Species), 
+    cex = 3, 
+    direction = "both", 
+    segment.size = 0.2
+    ) +
+  coord_fixed() +
+  labs(
+    title = "Stress = 0.1646",
+    colour = "Sites", 
+    shape = "Assemblages"
+    ) +
+  theme_classic()
+
+```
+
+The NMDS analysis based on the diatom composition of the modern and fossil samples esulted in a two-dimensional solution with final stress 0.16. As indicated on the NMDS biplot, most of the fossil samples were separated from the modern samples in the ordination space. In general, modern samples were ordinated on the right side of the diagram (NMDS1) and they were associated with brackish-freshwater plankton, epiphytes and tychoplankton ecological groups. Species situated on the middle and upper-right side of the plot were associated with modern samples of Negro and Chubut rivers. These taxa include Staurosira construens var. binodis, Cocconeis placentula, Stephanodiscus
+agassizensis, Cocconeis euglypta, Cocconeis pediculus, Epithemia sorex, Staurosira construens, Melosira varians, Aulacoseira granulata, Amphora pediculus and Amphora copulatoides. On the other hand, modern samples of Colorado River located on the lower right side were closely associated with taxa like Staurosira venter, Pseudostaurosira brevistriata, Punctastriata glubokoensis, Punctastriata lancettula, Pseudostaurosira
+oliveraiana and Diatoma tenuis. It is noteworthy that those last one modern samples showed a close relationship with the most of samples of T2, which indicates the analogy between both data sets.
