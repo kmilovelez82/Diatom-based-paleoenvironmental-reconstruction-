@@ -28,6 +28,54 @@ Seven sedimentary cores were analyzed. Diatom zones characterized by cluster ana
 
 species.complet <- readRDS("species.complet.rds")
 ```
+# **Bubble Plot For Fossil Assemblages** #
+A bubble plot was performed to compare the distribution of the most abundant fossil taxa in the samples. The bubbles are filled with different colors and each one represents the relative abundance (according to its size) of the species in the samples.
+
+```{r}
+
+species.red <- readRDS("species.red.rds")
+
+species.red <- gather(
+  species.red, 
+  "Species", 
+  "Abundance", -c(1,2)
+  )
+```
+
+```{r Bubble.plot, fig.width=8, fig.height=12, fig.align="center"}
+
+ggplot(
+  aes(x = Species, y = Depth, size = ifelse(Abundance==0, NA, Abundance), colour = Core), 
+  data = species.red
+  ) +
+  geom_point(
+    alpha = 0.6, 
+    show.legend = F
+    ) +
+  scale_x_discrete(
+    limits = species.red$Species, 
+    position = "top"
+    ) +
+  scale_y_continuous(
+    trans = "reverse"
+    ) +
+  labs(
+    x = "",
+    y = "Depth"
+    ) +
+  facet_grid(
+    rows = vars(Core),
+    scales = "free_y",
+    space = "free_y"
+    ) +
+  theme(
+    panel.background = element_blank(), 
+    panel.grid.major = element_blank(), 
+    panel.border = element_rect(color = "black", fill = NA),
+    axis.text.x = element_text(face = "bold", angle = 45, hjust = 0)
+    )
+```
+
 
 # **Non-Metric Multidimensional Scaling** #
 ```{r results = FALSE}
@@ -121,6 +169,6 @@ ggplot(site.scrs,
 
 ```
 
-The NMDS analysis based on the diatom composition of the modern and fossil samples esulted in a two-dimensional solution with final stress 0.16. As indicated on the NMDS biplot, most of the fossil samples were separated from the modern samples in the ordination space. In general, modern samples were ordinated on the right side of the diagram (NMDS1) and they were associated with brackish-freshwater plankton, epiphytes and tychoplankton ecological groups. Species situated on the middle and upper-right side of the plot were associated with modern samples of Negro and Chubut rivers. These taxa include Staurosira construens var. binodis, Cocconeis placentula, Stephanodiscus
-agassizensis, Cocconeis euglypta, Cocconeis pediculus, Epithemia sorex, Staurosira construens, Melosira varians, Aulacoseira granulata, Amphora pediculus and Amphora copulatoides. On the other hand, modern samples of Colorado River located on the lower right side were closely associated with taxa like Staurosira venter, Pseudostaurosira brevistriata, Punctastriata glubokoensis, Punctastriata lancettula, Pseudostaurosira
-oliveraiana and Diatoma tenuis. It is noteworthy that those last one modern samples showed a close relationship with the most of samples of T2, which indicates the analogy between both data sets.
+The NMDS analysis based on the diatom composition of the modern and fossil samples esulted in a two-dimensional solution with final stress 0.16. As indicated on the NMDS biplot, most of the fossil samples were separated from the modern samples in the ordination space. In general, modern samples were ordinated on the right side of the diagram (NMDS1) and they were associated with brackish-freshwater plankton, epiphytes and tychoplankton ecological groups. Species situated on the middle and upper-right side of the plot were associated with modern samples of Negro and Chubut rivers. These taxa include *Staurosira construens var. binodis, Cocconeis placentula, Stephanodiscus agassizensis, Cocconeis euglypta, Cocconeis pediculus, Epithemia sorex, Staurosira construens, Melosira varians, Aulacoseira granulata, Amphora pediculus and Amphora copulatoides*. On the other hand, modern samples of Colorado River located on the lower right side were closely associated with taxa like *Staurosira venter, Pseudostaurosira brevistriata, Punctastriata glubokoensis, Punctastriata lancettula, Pseudostaurosira oliveraiana and Diatoma tenuis*. It is noteworthy that those last one modern samples showed a close relationship with the most of samples of T2, which indicates the analogy between both data sets.
+
+
